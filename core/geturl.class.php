@@ -26,14 +26,13 @@ class GetUrl extends Define
 
 		$module = (strtolower($p[0]) == 'home' OR strtolower($p[0]) == 'accueil') ? $this -> default_mod : strtolower($p[0]);
 
-		if (in_array('ajax', $p)) {
-			$action = ($p[1] == 'ajax') ? 'index' : $p[1];
-		} else {
-			$action = (isset($data[1]) and !empty($data[1])) ? strtolower($data[1]) : 'index';
+		if (isset($_GET['file']) AND false !== strpos(strtolower($_GET['file']), 'ajax')) {
+			define('AJAX', true);
 		}
 
-		$id           = (isset($p[2]) AND !empty($p[2])) ? remove_accent($p[2]) : 0;
-		$page         = (isset($p[3]) AND !empty($p[3])) ? (int) $p[3] : '';
+		$action     = (isset($p[1]) and !empty($p[1])) ? strtolower($p[1]) : 'index';
+		$id         = (isset($p[2]) AND !empty($p[2])) ? remove_accent($p[2]) : 0;
+		$page       = (isset($p[3]) AND !empty($p[3])) ? (int) $p[3] : '';
 
 		$param = array(
 			'GET_MODULE' => $module,
@@ -45,3 +44,4 @@ class GetUrl extends Define
 		return $param;
 	}
 }
+new GetUrl();
