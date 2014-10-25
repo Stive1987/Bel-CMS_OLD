@@ -11,8 +11,7 @@
 
 if (basename (__FILE__) == basename ($_SERVER['SCRIPT_FILENAME'])) { die ('Direct access forbidden'); }
 
-$dateZone = 'europe/brussels';
-date_default_timezone_set($dateZone);
+date_default_timezone_set("Europe/Brussels");
 
 function debug ($var = null, $exitAfter = false) {
 	echo '<div style="width:100%;margin: 15px auto;padding:5px 10px;font-size:14px;background:#F1F1F1;color:black;"><pre>';
