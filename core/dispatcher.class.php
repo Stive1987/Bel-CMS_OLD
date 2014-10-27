@@ -12,13 +12,19 @@
 class Dispatcher extends Common
 {
 	protected $bel_cms_content;
+	protected $bel_cms_admin;
 
 	function __construct ()
 	{
-		self::renderTemplate();
+		if (defined('GET_ADMIN') && GET_ADMIN) {
+			self::renderAdmin();
+		} else {
+			self::renderTemplate();
+		}
 	}
 
-	private function getController () {
+	private function getController ()
+	{
 		$file = ROOT.'controller/'.GET_MODULE.'/controller.class.php';
 		if (!is_file($file)) {
 			self::error('le fichier du controller <strong>'.GET_MODULE.'</strong> n\'existe pas');
@@ -46,7 +52,7 @@ class Dispatcher extends Common
 		}
 	}
 
-	protected function getView ()
+	private function getView ()
 	{
 		$data = $this -> vars;
 		$fileViewModule    = ROOT.'view/'.GET_MODULE.'/'.GET_ACTION.'.tpl.php';
@@ -67,7 +73,7 @@ class Dispatcher extends Common
 	* Permet de verifier si une page home existe
 	* @return booleen
 	**/
-	protected function getHomePage ()
+	private function getHomePage ()
 	{
 		$file = ROOT.'templates/'.TEMPLATE.'/homepage.tpl.php';
 		if (is_file($file)) {
@@ -77,7 +83,7 @@ class Dispatcher extends Common
 		}
 	}
 
-	protected function renderModule ()
+	private function renderModule ()
 	{
 		ob_start();
 		if (HOME_PAGE AND self::getHomePage() !== false) {
@@ -94,13 +100,118 @@ class Dispatcher extends Common
 		ob_end_clean();
 	}
 
-	protected function renderTemplate ()
+	private function renderTemplate ()
 	{
 		self::renderModule();
 		if (defined('AJAX')) {
 			echo $this ->  bel_cms_content;
 		} else {
 			require_once ROOT.'templates/'.TEMPLATE.'/template.php';
+		}
+	}
+
+	/* ADMINISTRATION */
+
+	private function getModelAdmin ()
+	{
+		$file = ROOT.'assets/managements/pages/'.GET_MODULE.'/model.class.php';
+		if (is_file($file)) {
+			require_once $file;
+		}
+	}
+
+	private function getViewAdmin ()
+	{
+		$data = $this -> vars;
+		$file = ROOT.'assets/managements/pages/'.GET_MODULE.'/'.GET_ACTION.'.tpl.php';
+		if (!is_file($file)) {
+			self::error('le fichier de la vu <strong>'.GET_MODULE.' - '.GET_ACTION.'</strong> n\'existe pas');
+		} else {
+			require_once $file;
+		}
+	}
+
+	private function getControllerAdmin ()
+	{
+		if (GET_MODULE != 'index') {
+			$file = ROOT.'assets/managements/pages/'.GET_MODULE.'/controller.class.php';
+			if (!is_file($file)) {
+				self::error('le fichier du controller Admin <strong>'.GET_MODULE.'</strong> n\'existe pas');
+			} else {
+				require_once $file;
+				if (class_exists('ControllerModuleAdmin')) {
+					$ControllerModuleAdmin = new ControllerModuleAdmin();
+				} else {
+					self::error('la Class ControllerModuleAdmin du module <strong>'.GET_MODULE.'</strong> n\'existe pas');
+				}
+				if (method_exists('ControllerModuleAdmin', GET_ACTION)) {
+					$action = GET_ACTION;
+					self::set($ControllerModuleAdmin -> $action());
+				} else {
+					self::error('la Function '.GET_ACTION.' du module admin : <strong>'.GET_MODULE.'</strong> n\'existe pas');
+				}
+			}
+		}
+	}
+
+	private function renderPageAdmin ()
+	{
+		require_once ROOT.'assets/managements/commonadmin.class.php';
+		ob_start();
+		self::getModelAdmin();
+		self::getControllerAdmin();
+		if (!empty($this -> error)) {
+			echo $this -> error;
+		}
+		self::getViewAdmin();
+		$this -> bel_cms_admin = ob_get_contents();
+		ob_end_clean();
+		if (defined('AJAX')) {
+			echo $this -> bel_cms_admin;
+		} else {
+			require_once ROOT.'assets/managements/index.php';
+		}
+	}
+
+	private function renderLoginAdmin ()
+	{
+		require_once ROOT.'assets/managements/commonadmin.class.php';
+		ob_start();
+		if (isset($_POST) && (!empty($_POST))) {
+			if ($_POST['type'] == 'login') {
+				$return = array(
+					'text'       => $admin -> checkLogin($_POST),
+					'linkReturn' => 'Admin'
+				);
+			} else {
+				$return = array(
+					'text'       => 'Error Post',
+					'linkReturn' => 'Admin'
+				);
+			}
+			echo json_encode($return);
+		} else {
+			$file = ROOT.'assets/managements/login.php';
+			if (!is_file($file)) {
+				self::error('le fichier <strong>Login</strong> n\'existe pas');
+			} else {
+				require_once $file;
+			}
+		}
+		$this -> bel_cms_admin = ob_get_contents();
+		ob_end_clean();
+		if (!empty($this -> error)) {
+			echo $this -> error;
+		}
+		echo $this -> bel_cms_admin;
+	}
+
+	private function renderAdmin ()
+	{
+		if (!isset($_SESSION['admin']) || $_SESSION['admin'] === false || $_SESSION['admin_time'] < time()) {
+			self::renderLoginAdmin();
+		} else {
+			self::renderPageAdmin();
 		}
 	}
 }
