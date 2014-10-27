@@ -8,6 +8,7 @@
  * @copyright 2014 Bel-CMS
  * @author Stive - mail@stive.eu
  */
+
 function managementMistakes($type, $msg, $file, $l)
 {
 	switch ($type)

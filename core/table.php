@@ -9,10 +9,6 @@
  * @author Stive - mail@stive.eu
  */
 
-if (basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME'])) {
-	die('Direct access forbidden');
-}
-
 $array =   array(
 	'TABLE_COMMENTS'       => 'comments',
 	'TABLE_CONFIG'         => 'config',

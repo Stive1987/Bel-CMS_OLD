@@ -8,9 +8,6 @@
  * @copyright 2014 Bel-CMS
  * @author Stive - mail@stive.eu
  */
-
-if (basename (__FILE__) == basename ($_SERVER['SCRIPT_FILENAME'])) { die ('Direct access forbidden'); }
-
 date_default_timezone_set("Europe/Brussels");
 
 function debug ($var = null, $exitAfter = false) {

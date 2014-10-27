@@ -9,7 +9,6 @@
  * @author Stive - mail@stive.eu
  */
 
-
 class Config_CMS
 {
 	protected $return;
@@ -54,10 +53,11 @@ class Config_CMS
 			#####################################
 			# Réglages CMS
 			#####################################
-			'BASE_URL'  => 'http://'.$_SERVER['HTTP_HOST'],
-			'HOME_PAGE' => (empty($_GET['file'])) ? TRUE : FALSE,
+			'BASE_URL'    => 'http://'.$_SERVER['HTTP_HOST'],
+			'HOME_PAGE'   => (empty($_GET['file'])) ? TRUE : FALSE,
+			'CHECK_INDEX' => true,
 		);
-
+ 
 		return $return;
 	}
 

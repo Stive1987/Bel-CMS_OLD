@@ -9,9 +9,6 @@
  * @author Stive - mail@stive.eu
  */
 
-/**
-* 
-*/
 class Common
 {
 	protected $error    = null,
