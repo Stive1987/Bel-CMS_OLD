@@ -22,24 +22,36 @@ class GetUrl extends Define
 
 	private function getParamUrl ()
 	{
-		$p      = (isset($_GET['file']) AND !empty($_GET['file'])) ? explode('/', rtrim($_GET['file'], '/')) : array($this -> default_mod);
+		$p  = (isset($_GET['file']) && !empty($_GET['file'])) ? explode('/', rtrim($_GET['file'], '/')) : array($this -> default_mod);
+		$p0 = (strtolower($p[0]) == 'home' || strtolower($p[0]) == 'accueil') ? $this -> default_mod : strtolower($p[0]);
 
-		$module = (strtolower($p[0]) == 'home' OR strtolower($p[0]) == 'accueil') ? $this -> default_mod : strtolower($p[0]);
-
-		if (isset($_GET['file']) AND false !== strpos(strtolower($_GET['file']), 'ajax')) {
+		if (isset($_GET['file']) && false !== strpos(strtolower($_GET['file']), 'ajax')) {
 			define('AJAX', true);
 		}
 
-		$action     = (isset($p[1]) and !empty($p[1])) ? strtolower($p[1]) : 'index';
-		$id         = (isset($p[2]) AND !empty($p[2])) ? remove_accent($p[2]) : 0;
-		$page       = (isset($p[3]) AND !empty($p[3])) ? (int) $p[3] : '';
-
-		$param = array(
-			'GET_MODULE' => $module,
-			'GET_ACTION' => $action,
-			'GET_ID'     => $id,
-			'GET_PAGE'   => $page
-		);
+		if (!empty($p0) && $p0 == 'managements' || $p0 == 'admin') {
+			$p1 = (isset($p[1]) && !empty($p[1])) ? strtolower($p[1]) : 'index';
+			$p2 = (isset($p[2]) && !empty($p[2])) ? strtolower($p[2]) : 'index';
+			$p3 = (isset($p[3]) && !empty($p[3])) ? (int) $p[3] : '';
+			$p4 = (isset($p[4]) && !empty($p[4])) ? (int) $p[4] : '';
+			$param = array(
+				'GET_MODULE' => $p1,
+				'GET_ACTION' => $p2,
+				'GET_ID'     => $p3,
+				'GET_PAGE'   => $p4,
+				'GET_ADMIN'  => true
+			);
+		} else {
+			$p1 = (isset($p[1]) && !empty($p[1])) ? strtolower($p[1]) : 'index';
+			$p2 = (isset($p[2]) && !empty($p[2])) ? remove_accent($p[2]) : '';
+			$p3 = (isset($p[3]) && !empty($p[3])) ? (int) $p[3] : '';
+			$param = array(
+				'GET_MODULE' => $p0,
+				'GET_ACTION' => $p1,
+				'GET_ID'     => $p2,
+				'GET_PAGE'   => $p3
+			);
+		}
 
 		return $param;
 	}
