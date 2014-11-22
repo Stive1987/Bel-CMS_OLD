@@ -20,7 +20,9 @@ $array =   array(
 	'TABLE_ACTION'         => 'infos_action',
 	'TABLE_MAIL_BLACKLIST' => 'mails_blacklist',
 	'TABLE_NEWS'           => 'news',
-	'TABLE_USERS'          => 'users'
+	'TABLE_PAGES'          => 'pages',
+	'TABLE_USERS'          => 'users',
+	'TABLE_WIDGETS'        => 'widgets',
 );
 $define -> constant ($array);
 ?>
