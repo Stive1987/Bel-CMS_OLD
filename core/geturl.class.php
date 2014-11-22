@@ -9,51 +9,184 @@
  * @author Stive - mail@stive.eu
  */
 
-# Modules/Action/ID/Pages
-
 class GetUrl extends Define
 {
+	#####################################
+	# Variable declaration
+	#####################################
 	private $default_mod  = 'news';
-
+	private $url;
+	public  $module,
+		    $action,
+		    $id,
+		    $page,
+		    $ajax  = false,
+		    $admin = false;
+	#####################################
+	# Start Class
+	#####################################
 	function __construct ()
 	{
-		self::constant(self::getParamUrl());
+		self::getUrl ();
+		self::getAdmin ();
+		self::getNameModule ();
+		self::getNameAction ();
+		self::getId ();
+		self::getPage ();
+		self::getAjax ();
 	}
-
-	private function getParamUrl ()
+	#####################################
+	# Get url and parse parameter
+	#####################################
+	private function getUrl ()
 	{
-		$p  = (isset($_GET['file']) && !empty($_GET['file'])) ? explode('/', rtrim($_GET['file'], '/')) : array($this -> default_mod);
-		$p0 = (strtolower($p[0]) == 'home' || strtolower($p[0]) == 'accueil') ? $this -> default_mod : strtolower($p[0]);
-
-		if (isset($_GET['file']) && false !== strpos(strtolower($_GET['file']), 'ajax')) {
-			define('AJAX', true);
-		}
-
-		if (!empty($p0) && $p0 == 'managements' || $p0 == 'admin') {
-			$p1 = (isset($p[1]) && !empty($p[1])) ? strtolower($p[1]) : 'index';
-			$p2 = (isset($p[2]) && !empty($p[2])) ? strtolower($p[2]) : 'index';
-			$p3 = (isset($p[3]) && !empty($p[3])) ? (int) $p[3] : '';
-			$p4 = (isset($p[4]) && !empty($p[4])) ? (int) $p[4] : '';
-			$param = array(
-				'GET_MODULE' => $p1,
-				'GET_ACTION' => $p2,
-				'GET_ID'     => $p3,
-				'GET_PAGE'   => $p4,
-				'GET_ADMIN'  => true
-			);
+		$this -> url = isset($_REQUEST['param']) && !empty($_REQUEST['param']) ? explode('/', strtolower(rtrim($_REQUEST['param'], '/'))) : false;
+	}
+	#####################################
+	# Get the name of the module request
+	#####################################
+	private function getNameModule ()
+	{
+		if ($this -> admin) {
+			if (!empty($this -> url[1])) {
+				$module = strtolower($this -> url[1]);
+				if (in_array($module, scan_directory(ROOT.'assets/managements/pages/'))) {
+					$return = $module;
+				} else {
+					$return = 'index';
+				}
+			} else {
+				$return = 'index';
+			}
 		} else {
-			$p1 = (isset($p[1]) && !empty($p[1])) ? strtolower($p[1]) : 'index';
-			$p2 = (isset($p[2]) && !empty($p[2])) ? remove_accent($p[2]) : '';
-			$p3 = (isset($p[3]) && !empty($p[3])) ? (int) $p[3] : '';
-			$param = array(
-				'GET_MODULE' => $p0,
-				'GET_ACTION' => $p1,
-				'GET_ID'     => $p2,
-				'GET_PAGE'   => $p3
-			);
+			if (!empty($this -> url[0])) {
+				$module = strtolower($this -> url[0]);
+				if (in_array($module, scan_directory(ROOT.'controller/'))) {
+					$return = $module;
+				} else {
+					$return = $this -> default_mod;
+				}
+			} else {
+				$return = $this -> default_mod;
+			}
 		}
-
-		return $param;
+		$this -> module = $return;
+	}
+	#####################################
+	# Get the action of the module request
+	#####################################
+	private function getNameAction ()
+	{
+		if ($this -> admin) {
+			if (!empty($this -> url[2])) {
+				$return = strtolower($this -> url[2]);
+			} else {
+				$return = 'index';
+			}
+		} else {
+			if (!empty($this -> url[1])) {
+				$return = strtolower($this -> url[1]);
+			} else {
+				$return = 'index';
+			}
+		}
+		$this -> action = $return;
+	}
+	#####################################
+	# Get the id or rewrite name of the module request
+	#####################################
+	private function getId ()
+	{
+		if ($this -> admin) {
+			if (!empty($this -> url[3])) {
+				$return = (int) $this -> url[3];
+			} else {
+				$return = false;
+			}
+		} else {
+			if (!empty($this -> url[2])) {
+				if (is_numeric($this -> url[2])) {
+					$return = (int) $this -> url[2];
+				} else {
+					$return = remove_accent($this -> url[2]);
+				}
+			} else {
+				$return = false;
+			}
+		}
+		$this -> id = $return;
+	}
+	#####################################
+	# Get the number of the module request
+	#####################################
+	private function getPage ()
+	{
+		if ($this -> admin) {
+			if (!empty($this -> url[4])) {
+				if (is_numeric($this -> url[4])) {
+					$return = (int) $this -> url[4];
+				} else {
+					$return = false;
+				}
+			} else {
+				$return = false;
+			}
+		} else {
+			if (!empty($this -> url[3])) {
+				if (is_numeric($this -> url[3])) {
+					$return = (int) $this -> url[3];
+				} else {
+					$return = false;
+				}
+			} else {
+				$return = false;
+			}
+		}
+		$this -> page = $return;
+	}
+	#####################################
+	# Checks if it is a page in ajax
+	#####################################
+	private function getAjax ()
+	{
+		if (!empty($this -> url)) {
+			foreach ($this -> url as $k) {
+				if ($k == 'ajax') {
+					$return = true;
+					break;
+				} else {
+					$return = false;
+				}
+			}
+		} else {
+			$return = false;
+		}
+		$this -> ajax =  $return;
+	}
+	#####################################
+	# Checks if it is a page of the administration
+	#####################################
+	private function getAdmin ()
+	{
+		if (!empty($this -> url[0])) {
+			$module = strtolower($this -> url[0]);
+			if ($module == 'admin' || $module == 'managements') {
+				$return = true;
+			} else {
+				$return = false;
+			}
+		} else {
+			$return = false;
+		}
+		$this -> admin =  $return;
 	}
 }
-new GetUrl();
+$getUrl = new GetUrl();
+$define -> constant (array(
+	'GET_MODULE' => $getUrl -> module,
+	'GET_ACTION' => $getUrl -> action,
+	'GET_ID'     => $getUrl -> id,
+	'GET_PAGE'   => $getUrl -> page,
+	'GET_AJAX'   => $getUrl -> ajax,
+	'GET_ADMIN'  => $getUrl -> admin
+));
