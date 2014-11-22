@@ -17,11 +17,11 @@ class GetUrl extends Define
 	private $default_mod  = 'news';
 	private $url;
 	public  $module,
-		    $action,
-		    $id,
-		    $page,
-		    $ajax  = false,
-		    $admin = false;
+			$action,
+			$id,
+			$page,
+			$ajax  = false,
+			$admin = false;
 	#####################################
 	# Start Class
 	#####################################

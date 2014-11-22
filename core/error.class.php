@@ -50,18 +50,12 @@ function managementMistakes($type, $msg, $file, $l)
 
 	// Affichage de l'erreur
 
-	echo '	<div class="bel_cms_info_box '.$type_color.' clearfix">
-				<span></span>
-				<div class="bel_cms_info_box-wrap">
-					<h4>'.$type_erreur.'</h4>
-					<p>'.$erreur.'</p>
-				</div>
-			</div>';
+	require ROOT.'assets/error.tpl.php';
 }
 
-function theManagementExceptions($exception)  
+function theManagementExceptions($exception)
 {
-	managementMistakes (E_USER_ERROR, $exception->getMessage(), $exception->getFile(), $exception->getLine());  
+	managementMistakes (E_USER_ERROR, $exception->getMessage(), $exception->getFile(), $exception->getLine());
 }
 
 function managementOfFatalErrors()
@@ -76,12 +70,6 @@ function managementOfFatalErrors()
 		if ($type > 0) managementMistakes($type, $message, $fichier, $ligne);
 	}
 }
-
-error_reporting(0);
-set_error_handler('managementMistakes');
-set_exception_handler("theManagementExceptions");
-register_shutdown_function('managementOfFatalErrors');
-
 class Error
 {
 	protected static function swtich ($type = FALSE)
@@ -92,22 +80,22 @@ class Error
 				$type_error = "Erreur";
 				$type_color = "info-error";
 			break;
-				
+
 			case WARNING:
 				$type_error = "Avertissement";
 				$type_color = "info-warning";
 			break;
-				
+
 			case INFO:
 				$type_error = "Information";
 				$type_color = "info-info";
 			break;
-				
+
 			case SUCCESS:
 				$type_error = "Succès";
 				$type_color = "info-succes";
 			break;
-				
+
 			default:
 				$type_error = "Erreur inconnue";
 				$type_color = "info-error";
@@ -119,7 +107,6 @@ class Error
 	{
 		$switch = self::swtich($type);
 		$return = 	'	<div class="bel_cms_info_box '.$switch['type_color'].' clearfix">
-							<span></span>
 							<div class="bel_cms_info_box-wrap">
 								<h4>'.$switch['type_error'].'</h4>
 								<p>'.$text.'</p>
