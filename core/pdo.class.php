@@ -14,10 +14,15 @@ $define -> constant ($array);
 
 class GETBDD
 {
+	#####################################
+	# Variable declaration
+	#####################################
     private static $instance;
     private static $conf = 'local';
     protected $bdd;
-
+	#####################################
+	# Start Class
+	#####################################
     public function __construct()
     {
         $pdo_options = array();
@@ -31,18 +36,20 @@ class GETBDD
             die('Échec lors de la connexion : ' . $e -> getMessage());
         }
     }
-
+	#####################################
+	# Get instance
+	#####################################
     public static function getInstance()
     {
-        // Générer l'instance
         if (!self::$instance)
         {
             self::$instance = new BDD();
         }
-
         return self::$instance;
     }
-
+	#####################################
+	# Create where for BDD
+	#####################################
     protected function createWhere($wheres)
     {
         $sql = " WHERE 1 ";
@@ -82,6 +89,9 @@ class GETBDD
 
 class BDD extends GETBDD
 {
+	#####################################
+	# Retrieves the given database
+	#####################################
 	public function read($data = array())
 	{
 		$GLOBALS['count_queries']++;
@@ -118,7 +128,9 @@ class BDD extends GETBDD
 
 		return $returnData;
 	}
-
+	#####################################
+	# Insert data into database
+	#####################################
 	public function insert($data = array())
 	{
 		$GLOBALS['count_queries']++;
@@ -138,7 +150,9 @@ class BDD extends GETBDD
 
 		return true;
 	}
-
+	#####################################
+	# Returns the number of line
+	#####################################
 	public function count($data = array())
 	{
 		$GLOBALS['count_queries']++;
@@ -160,7 +174,9 @@ class BDD extends GETBDD
 
 		return $returnData;
 	}
-
+	#####################################
+	# Update an online database
+	#####################################
 	public function update($data = array())
 	{
 		$GLOBALS['count_queries']++;
@@ -197,7 +213,9 @@ class BDD extends GETBDD
 		return true;
 
 	}
-
+	#####################################
+	# Deletes a row in the database
+	#####################################
 	public function delete($data = array())
 	{
 		$GLOBALS['count_queries']++;
@@ -224,7 +242,9 @@ class BDD extends GETBDD
 
 		return true;
 	}
-
+	#####################################
+	# account on multiple table
+	#####################################
 	public function countAll($data = array())
 	{
 		$GLOBALS['count_queries']++;
@@ -252,7 +272,9 @@ class BDD extends GETBDD
 			return $returnData;
 		}
 	}
-
+	#####################################
+	# randomly retrieves line
+	#####################################
 	public function readRand($data = array())
 	{
 		$GLOBALS['count_queries']++;
@@ -288,7 +310,9 @@ class BDD extends GETBDD
 
 		return $returnData;
 	}
-
+	#####################################
+	# Security
+	#####################################
 	private function secureField($value)
 	{
 		return ':'.$value;

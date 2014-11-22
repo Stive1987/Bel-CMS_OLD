@@ -8,14 +8,15 @@
  * @copyright 2014 Bel-CMS
  * @author Stive - mail@stive.eu
  */
-
-$start_microtime = microtime(true);
+$GLOBALS['start_page']    = microtime(true);
+$GLOBALS['count_queries'] = null;
 
 define ('ROOT', str_replace('index.php', '', $_SERVER['SCRIPT_FILENAME']));
-$GLOBALS['count_queries'] = null;
 
 require dirname(__FILE__) . '/assets/include.php';
 
-new Dispatcher();
+set_error_handler('managementMistakes');
+set_exception_handler("theManagementExceptions");
+register_shutdown_function('managementOfFatalErrors');
 
-$end_microtime   = round(microtime(true) - $start_microtime, 3).' s';
+new Dispatcher();
