@@ -8,13 +8,17 @@
  * @copyright 2014 Bel-CMS
  * @author Stive - mail@stive.eu
  */
-
 class Common
 {
-	protected $error    = null,
-			  $vars     = array();
-
-	protected function error ($data = null)
+	#####################################
+	# Variable declaration
+	#####################################
+	protected $error      = null,
+	          $vars       = array();
+	#####################################
+	# Data Error
+	#####################################
+	public function error ($data = null)
 	{
 		$this -> error =  '
 			<div class="bel_cms_info_box info-error clearfix">
@@ -25,25 +29,49 @@ class Common
 				</div>
 			</div>';
 	}
-
+	#####################################
+	# Get all style
+	#####################################
 	public function getCss ()
 	{
-		$files      = array();
-		$return     = '';
-		$files[]    = 'assets/css/bel-cms.css';
-		$fileModule = ROOT.'assets/css/modules/'.GET_MODULE.'.css';
+		$listWidgetsActive = array();
+		if (isset($GLOBALS['widgets']) && !empty($GLOBALS['widgets'])) {
+			$listWidgetsActive = array();
+			$listWidgetsDirCss = array();
+			foreach ($GLOBALS['widgets'] as $k => $v) {
+				if (is_array($v)) {
+					foreach ($v as $k_name => $v_del) {
+						$listWidgetsActive[] = $k_name;
+					}
+				} else {
+					$listWidgetsActive[] = $v;
+				}
+			}
+		}
+
+		$files          = array();
+		$return         = '';
+		$files[]        = ROOT_ABS.'assets/css/bel-cms.css';
+		$fileModule     = ROOT.'assets/css/modules/'.GET_MODULE.'.css';
+		$filesTplModule = TEMPLATE.'css/modules/'.GET_MODULE.'.css';
 
 		if (ACTIVE_ICON == 1) {
-			$files[] = 'assets/css/foundation-icons.css';
+			$files[] = ROOT_ABS.'assets/css/foundation-icons.css';
 		}
 
 		if (is_file($fileModule)) {
-			$files[] = 'assets/css/modules/'.GET_MODULE.'.css';
+			$files[] = ROOT_ABS.'assets/css/modules/'.GET_MODULE.'.css';
 		}
 
-		$filesModule = 'templates/'.TEMPLATE.'/css/modules/'.GET_MODULE.'.css';
-		if (is_file($filesModule)) {
-			$files[] = $filesModule;
+		if (is_file($filesTplModule)) {
+			$files[] = ACCESS_TEMPLATE.'css/modules/'.GET_MODULE.'.css';
+		}
+
+		foreach ($listWidgetsActive as $k => $v) {
+			$tmpFileRoot = ROOT.'widgets/'.$v.'/style.css';
+			if (is_file($tmpFileRoot)) {
+				$files[] = ROOT_ABS.'widgets/'.$v.'/style.css';
+			}
 		}
 
 		foreach ($files as $k => $v) {
@@ -52,26 +80,49 @@ class Common
 
 		return $return;
 	}
-
+	#####################################
+	# Get all JS
+	#####################################
 	public function getJs ()
 	{
-		$files      = array();
-		$return     = '';
-		$fileModule = ROOT.'assets/js/modules/'.GET_MODULE.'.js';
-
-	    if (ACTIVE_JQUERY == 1) {
-	        $files[] = 'assets/js/jquery-2.1.1.min.js';
-	    }
-
-		$files[]    = 'assets/js/bel-cms.js';
-
-		if (is_file($fileModule)) {
-			$files[] = 'assets/js/modules/'.GET_MODULE.'.js';
+		$listWidgetsActive = array();
+		if (isset($GLOBALS['widgets']) && !empty($GLOBALS['widgets'])) {
+			$listWidgetsActive = array();
+			$listWidgetsDirCss = array();
+			foreach ($GLOBALS['widgets'] as $k => $v) {
+				if (is_array($v)) {
+					foreach ($v as $k_name => $v_del) {
+						$listWidgetsActive[] = $k_name;
+					}
+				} else {
+					$listWidgetsActive[] = $v;
+				}
+			}
 		}
 
-		$filesModule = 'templates/'.TEMPLATE.'/js/modules/'.GET_MODULE.'.js';
-		if (is_file($filesModule)) {
-			$files[] = $filesModule;
+		$files          = array();
+		$return         = '';
+		$files[]        = ROOT_ABS.'assets/js/bel-cms.js';
+		$fileModule     = ROOT.'assets/js/modules/'.GET_MODULE.'.js';
+		$filesTplModule = TEMPLATE.'js/modules/'.GET_MODULE.'.js';
+
+		if (ACTIVE_JQUERY == 1) {
+			$files[] = ROOT_ABS.'assets/js/jquery-2.1.1.min.js';
+		}
+
+		if (is_file($fileModule)) {
+			$files[] = ROOT_ABS.'assets/js/modules/'.GET_MODULE.'.js';
+		}
+
+		if (is_file($filesTplModule)) {
+			$files[] = ACCESS_TEMPLATE.'js/modules/'.GET_MODULE.'.js';
+		}
+
+		foreach ($listWidgetsActive as $k => $v) {
+			$tmpFileRoot = ROOT.'widgets/'.$v.'/script.js';
+			if (is_file($tmpFileRoot)) {
+				$files[] = ROOT_ABS.'widgets/'.$v.'/script.js';
+			}
 		}
 
 		foreach ($files as $k => $v) {
@@ -80,26 +131,9 @@ class Common
 
 		return $return;
 	}
-
-	/**
-	* Permet de passer une ou plusieurs variable à la vue
-	* @param $key nom de la variable OU tableau de variables
-	* @param $value Valeur de la variable
-	**/
-	public function set ($key,$value=null)
-	{
-		if (is_array($key)) {
-			$this -> vars += $key;
-		}
-		else {
-			if ($value) {
-				$this -> vars[$key] = $value;
-			} else {
-				$this -> vars[] = $key;
-			}
-		}
-	}
-
+	#####################################
+	# Redirect function
+	#####################################
 	public static function redirect ($url = null, $time = null)
 	{
 		$url  = (empty($url)) ? (empty($_SERVER['HTTP_REFERER'])) ? $_SERVER['SERVER_NAME'] : $_SERVER['HTTP_REFERER'] : $_SERVER['HTTP_HOST'].'/'.$url;
@@ -114,6 +148,22 @@ class Common
 		}, <?php echo $time; ?>);
 		</script>
 		<?php
+	}
+	#####################################
+	# Set var
+	#####################################
+	public function set ($key,$value=null)
+	{
+		if (is_array($key)) {
+			$this -> vars += $key;
+		}
+		else {
+			if ($value) {
+				$this -> vars[$key] = $value;
+			} else {
+				$this -> vars[] = $key;
+			}
+		}
 	}
 
 }
