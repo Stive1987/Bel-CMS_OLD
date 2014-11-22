@@ -14,6 +14,9 @@
 */
 class Users
 {
+	#####################################
+	# Variable declaration
+	#####################################
 	protected static $_table = 'users';
 	protected static $info;
 	protected static $def = array(
@@ -28,7 +31,9 @@ class Users
 		'valid',
 		'last_ip'
 	);
-
+	#####################################
+	# Start Class
+	#####################################
 	public function __construct () {
 		if (!session_id()) {
 			session_start();
@@ -36,7 +41,9 @@ class Users
 			self::updateLastVistst();
 		}
 	}
-	// Update last visit
+	#####################################
+	# Update last visit
+	#####################################
 	public static function updateLastVistst() {
 		if (isset($_SESSION['hash_key'])) {
 			return BDD::getInstance() -> update(
@@ -56,8 +63,9 @@ class Users
 			$_SESSION['groups'] = 3;
 		}
 	}
-
-
+	#####################################
+	# login function
+	#####################################
 	public static function login($name = null, $password = null)
 	{
 		// Verifie que $name & $password ne son pas vide
@@ -102,18 +110,24 @@ class Users
 		}
 		return $return;
 	}
-
+	#####################################
+	# Registration
+	#####################################
 	public static function registration(array $datas) {
 	   return 'L\'enregistrement a été effectué avec succès.';
 	}
-
+	#####################################
+	# Logout
+	#####################################
 	public static function logout()
 	{
 		setcookie('BEL-CMS-COOKIE', NULL, -1, '/');
 		session_destroy();
 		return 'Votre session est vos cookie de ce site sont effacés';
 	}
-
+	#####################################
+	# Auto connection through cookie
+	#####################################
 	public static function autoLogin()
 	{
 		// Si la session existe déjà, inutile d'aller plus loin
@@ -163,7 +177,9 @@ class Users
 			}
 		}
 	}
-
+	#####################################
+	# Info user or multiple users
+	#####################################
 	public static function getInfosUser($id = null)
 	{
 		$datas = array();
