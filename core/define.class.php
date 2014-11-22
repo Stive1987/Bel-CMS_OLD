@@ -11,13 +11,23 @@
 
 class Define
 {
-	public function constant ($array = array())
+	public function constant ($data = false, $value = false)
 	{
-		foreach ($array as $constant => $tableName) {
-			if (!defined($constant)) {
-    			define($constant, $tableName);
-    		}
-		}
+        if ($data) {
+            if (is_array($data)) {
+                foreach ($data as $constant => $tableName) {
+                    if (!defined($constant)) {
+                        define($constant, $tableName);
+                    }
+                } 
+            } else {
+                if ($value || $data) {
+                	if (!defined($constant)) {
+                    	define($data, $value);
+                    }
+                }
+            }
+        }
 	}
 }
 $define = new Define();
