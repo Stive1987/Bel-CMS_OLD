@@ -149,6 +149,18 @@ function dir_size ($dir = false) {
 	return $size;
 }
 
+function scan_directory($dir) {
+	$list_dir = array();
+	$my_directory = opendir($dir) or die('Error');
+	while($entry = @readdir($my_directory)) {
+		if (is_dir($dir.'/'.$entry) && $entry != '.' && $entry != '..') {
+			$list_dir[] = $entry;
+		}
+	}
+	closedir($my_directory);
+	return $list_dir;
+}
+
 function return_bytes ($val) {
 	$val = trim($val);
 	$last = strtolower($val[strlen($val)-1]);
