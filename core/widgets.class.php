@@ -20,18 +20,32 @@ final class widgets
 	#####################################
 	# Start Class
 	#####################################
-	function __construct($positioning)
+	function __construct($data)
 	{
-		if (array_key_exists($positioning, $GLOBALS['widgets'])) {
-			foreach ($GLOBALS['widgets'][$positioning] as $key => $value) {
-				if ($value['cache'] === true) {
+		if (!array_key_exists($data, $GLOBALS['widgets'])) {
+			foreach ($GLOBALS['widgets'] as $name => $value) {
+				if ($value['positioning'] == $data && $value['activate']) {
+					if ($value['cache'] === true) {
+						$cache = new Cache(ROOT.'tmp_cache/', 60);
+						if (!$cache -> start($name)) {
+							self::getGlobalfunction($name, $value);
+						}
+						$cache -> end();
+					} else {
+						self::getGlobalfunction($name, $value);
+					}
+				}
+			}
+		} else {
+			if ($GLOBALS['widgets'][$data]['get'] === false) {
+				if ($GLOBALS['widgets'][$data]['cache'] === true) {
 					$cache = new Cache(ROOT.'tmp_cache/', 60);
-					if (!$cache -> start($key)) {
-						self::getGlobalfunction($key, $value);
+					if (!$cache -> start($data)) {
+						self::getGlobalfunction($data, $GLOBALS['widgets'][$data]);
 					}
 					$cache -> end();
 				} else {
-					self::getGlobalfunction($key, $value);
+					self::getGlobalfunction($data, $GLOBALS['widgets'][$data]);
 				}
 			}
 		}
@@ -47,6 +61,7 @@ final class widgets
 		self::getView($key, $value['fileView']);
 		$this ->  content = ob_get_contents();
 		ob_end_clean();
+		$GLOBALS['widgets'][$key]['get'] = true;
 		self::getGlobalView();
 	}
 	#####################################
@@ -82,7 +97,7 @@ final class widgets
 	private function getModel ($name, $dir)
 	{
 		if (file_exists($dir)) {
-			require $dir;
+			require_once $dir;
 		}
 	}
 	#####################################
@@ -91,8 +106,8 @@ final class widgets
 	private function getController ($name, $dir)
 	{
 		if (file_exists($dir)) {
-			require $dir;
 			$nameController = 'ControllerWidget'.ucfirst($name);
+			require_once $dir;
 			if (class_exists($nameController)) {
 				$controller = new $nameController();
 				foreach ($controller as $key => $value) {
@@ -143,6 +158,26 @@ class GetWidgetsList
 		$GLOBALS['widgets'] = self::getWidgetsActive();
 	}
 	#####################################
+	# Get name position widgets
+	#####################################
+	public function getWidgetsNamePosition ($data) {
+		switch ($data) {
+			case 1:
+				$return = TOP;
+				break;
+			case 2:
+				$return = RIGHT;
+				break;
+			case 3:
+				$return = BOTTOM;
+				break;
+			case 4:
+				$return = LEFT;
+				break;
+		}
+		return $return;
+	}
+	#####################################
 	# Get widgtes active (array)
 	#####################################
 	public function getWidgetsActive ()
@@ -154,51 +189,21 @@ class GetWidgetsList
 
 		foreach (scan_directory(ROOT.$this -> widgetsDir) as $name) {
 			if (array_key_exists($name, $returnListWidgetsSql)) {
-				if ($returnListWidgetsSql[$name]['activate'] && $returnListWidgetsSql[$name]['access']) {
+				if ($returnListWidgetsSql[$name]['access']) {
 					$arrayListWidgets[$name] = array(
 						'fileModel'      => ROOT.$this -> widgetsDir.$name.'/model.class.php',
 						'fileView'       => ROOT.$this -> widgetsDir.$name.'/view.tpl',
 						'fileController' => ROOT.$this -> widgetsDir.$name.'/controller.class.php',
-						'positioning'    => $returnListWidgetsSql[$name]['positioning'],
-						'cache'          => $returnListWidgetsSql[$name]['cache']
+						'positioning'    => self::getWidgetsNamePosition($returnListWidgetsSql[$name]['positioning']),
+						'cache'          => $returnListWidgetsSql[$name]['cache'],
+						'activate'       => $returnListWidgetsSql[$name]['activate'],
+						'get'            => false
 					);
 				}
 			}
 		}
-		foreach ($arrayListWidgets as $key => $value) {
-			if (file_exists($value['fileView']) && file_exists($value['fileController'])) {
-				if ($value['positioning'] == 0) {
-					$return[TOP][$key] = array(
-						'fileModel'      => $value['fileModel'],
-						'fileView'       => $value['fileView'],
-						'fileController' => $value['fileController'],
-						'cache'          => $value['cache']
-					);
-				} else if ($value['positioning'] == 1) {
-					$return[RIGHT][$key] = array(
-						'fileModel'      => $value['fileModel'],
-						'fileView'       => $value['fileView'],
-						'fileController' => $value['fileController'],
-						'cache'          => $value['cache']
-					);
-				} else if ($value['positioning'] == 2) {
-					$return[BOTTOM][$key] = array(
-						'fileModel'      => $value['fileModel'],
-						'fileView'       => $value['fileView'],
-						'fileController' => $value['fileController'],
-						'cache'          => $value['cache']
-					);
-				} else if ($value['positioning'] == 3) {
-					$return[LEFT][$key] = array(
-						'fileModel'      => $value['fileModel'],
-						'fileView'       => $value['fileView'],
-						'fileController' => $value['fileController'],
-						'cache'          => $value['cache']
-					);
-				}
-			}
-		}
-		return $return;
+
+		return $arrayListWidgets;
 	}
 	#####################################
 	# Look activate widgets

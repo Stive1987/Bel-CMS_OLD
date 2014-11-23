@@ -34,21 +34,6 @@ class Common
 	#####################################
 	public function getCss ()
 	{
-		$listWidgetsActive = array();
-		if (isset($GLOBALS['widgets']) && !empty($GLOBALS['widgets'])) {
-			$listWidgetsActive = array();
-			$listWidgetsDirCss = array();
-			foreach ($GLOBALS['widgets'] as $k => $v) {
-				if (is_array($v)) {
-					foreach ($v as $k_name => $v_del) {
-						$listWidgetsActive[] = $k_name;
-					}
-				} else {
-					$listWidgetsActive[] = $v;
-				}
-			}
-		}
-
 		$files          = array();
 		$return         = '';
 		$files[]        = ROOT_ABS.'assets/css/bel-cms.css';
@@ -67,10 +52,12 @@ class Common
 			$files[] = ACCESS_TEMPLATE.'css/modules/'.GET_MODULE.'.css';
 		}
 
-		foreach ($listWidgetsActive as $k => $v) {
-			$tmpFileRoot = ROOT.'widgets/'.$v.'/style.css';
-			if (is_file($tmpFileRoot)) {
-				$files[] = ROOT_ABS.'widgets/'.$v.'/style.css';
+		foreach ($GLOBALS['widgets'] as $name => $value) {
+			if ($value['activate']) {
+				$file = ROOT.'widgets/'.$name.'/style.css';
+				if (is_file($file)) {
+					$files[] = ROOT_ABS.'widgets/'.$name.'/style.css';
+				}
 			}
 		}
 
@@ -85,21 +72,6 @@ class Common
 	#####################################
 	public function getJs ()
 	{
-		$listWidgetsActive = array();
-		if (isset($GLOBALS['widgets']) && !empty($GLOBALS['widgets'])) {
-			$listWidgetsActive = array();
-			$listWidgetsDirCss = array();
-			foreach ($GLOBALS['widgets'] as $k => $v) {
-				if (is_array($v)) {
-					foreach ($v as $k_name => $v_del) {
-						$listWidgetsActive[] = $k_name;
-					}
-				} else {
-					$listWidgetsActive[] = $v;
-				}
-			}
-		}
-
 		$files          = array();
 		$return         = '';
 		$files[]        = ROOT_ABS.'assets/js/bel-cms.js';
@@ -118,10 +90,12 @@ class Common
 			$files[] = ACCESS_TEMPLATE.'js/modules/'.GET_MODULE.'.js';
 		}
 
-		foreach ($listWidgetsActive as $k => $v) {
-			$tmpFileRoot = ROOT.'widgets/'.$v.'/script.js';
-			if (is_file($tmpFileRoot)) {
-				$files[] = ROOT_ABS.'widgets/'.$v.'/script.js';
+		foreach ($GLOBALS['widgets'] as $name => $value) {
+			if ($value['activate']) {
+				$file = ROOT.'widgets/'.$name.'/script.js';
+				if (is_file($file)) {
+					$files[] = ROOT_ABS.'widgets/'.$name.'/script.js';
+				}
 			}
 		}
 
