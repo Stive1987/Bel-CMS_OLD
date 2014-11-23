@@ -1,0 +1,43 @@
+#bel_cms_calendar {
+
+}
+	#bel_cms_calendar_months_year {
+		display: block;
+		text-align: center;
+		margin-bottom: 5px;
+	}
+	#bel_cms_calendar_months {
+
+	}
+	.bel_cms_calendar_month {
+		display: none;
+	}
+	.bel_cms_calendar_month.current {
+		display: block;
+		margin: auto;
+	}
+	.bel_cms_calendar_month table {
+		margin: auto;
+	}
+	.bel_cms_calendar_month table > thead > tr > th, table > thead > tr > td {
+		padding: 6px;
+	}
+	.bel_cms_calendar_month td {
+		padding: 6px;
+	}
+	.bel_cms_calendar_month td:hover {
+		cursor: pointer;
+		background: rgba(0,0,0,.05);
+	}
+	.bel_cms_calendar_month td.none {
+		cursor: auto;
+		background: transparent;
+	}
+	.bel_cms_calendar_month .current {
+		font-weight: bold;
+		background: rgba(0,0,0,.1);
+	}
+	.bel_cms_calendar_month td:hover.current {
+		background: rgba(0,0,0,.15);
+	}
+
