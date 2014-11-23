@@ -1,0 +1,23 @@
+#bel_cms_stats {
+
+}
+	#bel_cms_stats .widgets_title {
+		text-align: center;
+		font-weight: bold;
+		font-size: 16px;
+		margin-bottom: 10px;
+		border-bottom: 1px dashed rgba(0,0,0,.2);
+		line-height: 24px;
+	}
+	#bel_cms_stats ul  {
+		display: block;
+		list-style: none;
+		margin: 0; padding: 0;
+	}
+		#bel_cms_stats ul li {
+			display: block;
+		}
+			#bel_cms_stats ul li span {
+				float: right;
+				font-weight: bold;
+			}
