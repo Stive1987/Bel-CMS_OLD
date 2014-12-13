@@ -37,11 +37,12 @@ class Common
 		$files          = array();
 		$return         = '';
 		$files[]        = ROOT_ABS.'assets/css/bel-cms.css';
+		$files[]        = ROOT_ABS.'assets/managements/css/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css';
 		$fileModule     = ROOT.'assets/css/modules/'.GET_MODULE.'.css';
 		$filesTplModule = TEMPLATE.'css/modules/'.GET_MODULE.'.css';
 
 		if (ACTIVE_ICON == 1) {
-			$files[] = ROOT_ABS.'assets/css/foundation-icons.css';
+			$files[] = ROOT_ABS.'assets/css/ionicons.min.css';
 		}
 
 		if (is_file($fileModule)) {
@@ -74,13 +75,13 @@ class Common
 	{
 		$files          = array();
 		$return         = '';
-		$files[]        = ROOT_ABS.'assets/js/bel-cms.js';
-		$fileModule     = ROOT.'assets/js/modules/'.GET_MODULE.'.js';
-		$filesTplModule = TEMPLATE.'js/modules/'.GET_MODULE.'.js';
-
 		if (ACTIVE_JQUERY == 1) {
 			$files[] = ROOT_ABS.'assets/js/jquery-2.1.1.min.js';
 		}
+		$files[]        = ROOT_ABS.'assets/plugins/tinymce/tinymce.min.js';
+		$files[]        = ROOT_ABS.'assets/js/bel-cms.js';
+		$fileModule     = ROOT.'assets/js/modules/'.GET_MODULE.'.js';
+		$filesTplModule = TEMPLATE.'js/modules/'.GET_MODULE.'.js';
 
 		if (is_file($fileModule)) {
 			$files[] = ROOT_ABS.'assets/js/modules/'.GET_MODULE.'.js';
@@ -100,7 +101,7 @@ class Common
 		}
 
 		foreach ($files as $k => $v) {
-			$return .= '<script src="'.$v.'" type="text/javascript"></script>'."\n";
+			$return .= '<script src="'.$v.'"></script>'."\n";
 		}
 
 		return $return;
@@ -139,5 +140,32 @@ class Common
 			}
 		}
 	}
+	#####################################
+	# Send Mail
+	#####################################
+	public static function sendMail(array $data)
+	{
+		$fromName = NAME_WEBSITE;
+		$fromMail = MAIL_ADMIN;
+		$subject  = (isset($data['subject']) AND !empty($data['subject'])) ? $data['subject'] : 'Mail test Bel-CMS';
+		$content  = (isset($data['content']) AND !empty($data['content'])) ? $data['content'] : 'Ceci est un test mail';
+		$sendMail = (isset($data['sendMail']) AND !empty($data['sendMail'])) ? $data['sendMail'] : false;
 
+		if ($sendMail) {
+			if (filter_var($sendMail, FILTER_VALIDATE_EMAIL)) {
+				$headers   = array();
+				$headers[] = "MIME-Version: 1.0";
+				$headers[] = 'Content-Type: text/html; charset="utf-8"';
+				$headers[] = "From: {$fromName} <{$fromMail}>";
+				$headers[] = "Reply-To: NoReply <{$fromMail}>";
+				$headers[] = "X-Mailer: PHP/".phpversion();
+				$return = @mail($sendMail, $subject, $content, implode("\n", $headers));
+			} else {
+				$return = false;
+			}
+		} else {
+			$return = false;
+		}
+		return $return;
+	}
 }

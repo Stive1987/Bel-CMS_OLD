@@ -15,6 +15,7 @@ class Config_CMS
 	# Variable declaration
 	#####################################
 	public 	$groups;
+	public  $valid;
 	private $template;
 	private static $def_config = array(
 		'name',
@@ -30,6 +31,7 @@ class Config_CMS
 	function __construct()
 	{
 		self::getGroups();
+		self::getStatusUsers();
 	}
 	#####################################
 	# Get template
@@ -158,6 +160,13 @@ class Config_CMS
 			$return = false;
 		}
 		return $return;
+	}
+	#####################################
+	# Get status user
+	#####################################
+	public function getStatusUsers ()
+	{
+		$this -> valid = array(0 => GUEST, 1 => VALID);;
 	}
 
 }

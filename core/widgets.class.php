@@ -235,7 +235,7 @@ class GetWidgetsList
 	#####################################
 	# Look authorization widgets
 	#####################################
-	protected function authorizationWidgets ($data)
+	protected function authorizationWidgets (array $data)
 	{
 		if ($data && is_array($data)) {
 			if (isset($_SESSION['groups']) && !empty($_SESSION['groups'])) {
@@ -244,8 +244,12 @@ class GetWidgetsList
 					$return = (in_array($v, $data)) ? true : false;
 					if ($return) break;
 				}
+			} else {
+				$return = (in_array(3, $data)) ? true : false;
 			}
-		} else $return = false;
+		} else { 
+			$return = false;
+		}
 		return $return;
 	}
 }
