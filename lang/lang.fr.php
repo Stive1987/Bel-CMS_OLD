@@ -30,6 +30,16 @@ $lang = array(
 	'VALIDATE_MEMBER' => 'Membre validé',
 	'VALIDATE_MEMBER' => 'Membre en actif',
 	'PENDINNG_MEMBER' => 'Membre en attente',
+	'UNKNOWN'         => 'Inconnu',
+	'GUEST'           => 'Visiteur',
+	'VALID'           => 'Valider',
+    'SEE'             => 'Voir',
+    'ADD'             => 'Ajouter',
+    'EDIT'            => 'Editer',
+    'MODIFY'          => 'Modifier',
+    'DELETE'          => 'Supprimer',
+    'BACK'            => 'Retour',
+    'CONFIRM'         => 'Confirmer',
 	#####################################
 	# POSITION
 	#####################################
@@ -42,5 +52,10 @@ $lang = array(
 	#####################################
 	'ERROR_PAGES'     => 'ID (bel_cms_page_title_content) du contenue n\'est pas present',
 	'ERROR_PAGES_SQL' => 'La page n\'est pas présente dans la base de données',
+	#####################################
+	# MODULE USER
+	#####################################
+	'WOMAN'           => 'Femme',
+	'MAN'             => 'Homme',
 );
 $define -> constant ($lang);
