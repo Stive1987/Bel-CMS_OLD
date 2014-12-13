@@ -48,7 +48,7 @@ $dates = $this->date;
 						<?php
 						endif;
 						?>
-						<td <?php echo $currentDay; ?>><?php echo $d; ?></td>
+							<td <?php echo $currentDay; ?>><?php echo $d; ?></td>
 						<?php
 						if ($w == 7):
 						?>

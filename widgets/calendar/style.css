@@ -37,6 +37,9 @@
 		font-weight: bold;
 		background: rgba(0,0,0,.1);
 	}
+	.bel_cms_calendar_month .none {
+		display: none;
+	}
 	.bel_cms_calendar_month td:hover.current {
 		background: rgba(0,0,0,.15);
 	}
