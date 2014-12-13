@@ -25,19 +25,24 @@ function get_local () {
 
 function get_ip () {
 	if (isset($_SERVER['HTTP_CLIENT_IP'])) {
-		return $_SERVER['HTTP_CLIENT_IP'];
+		$return =  $_SERVER['HTTP_CLIENT_IP'];
 	}
 	elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-		return $_SERVER['HTTP_X_FORWARDED_FOR'];
+		$return =  $_SERVER['HTTP_X_FORWARDED_FOR'];
 	}
 	else {
-		return (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '');
+		$return =  (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '');
 	}
+	if ($return == '::1') {
+		$return = 'localhost';
+	}
+	return $return;
 }
 
 function trim_value (&$value) {
 	$value = trim($value);
 }
+
 function cutText($text, $length, $ending = '...', $exact = false) {
 	if (strlen(preg_replace('/<.*?>/', '', $text)) <= $length) {
 		return $text;
@@ -97,7 +102,7 @@ function cutText($text, $length, $ending = '...', $exact = false) {
 * @return src gravatar or avatar default
 */
 function get_gravatar ($mail, $size = 100) {
-	$default = 'includes/img/nkAvatar.jpg';
+	$default = ROOT_ABS.'assets/img/default_avatar.gif';
 	if (empty($mail)) {
 		$return = $default;
 	} else {
@@ -149,7 +154,73 @@ function dir_size ($dir = false) {
 	return $size;
 }
 
-function scan_directory($dir) {
+function convert_size($size)
+{
+	if ($size < 1024) {
+		return $size.' Oc';
+	} else if ($size >= 1024 && $size < 1048576) {
+		return round($size/1024,2).' Ko';
+	} else if($size >= 1048576 && $size < 1073741824) {
+		return round(($size/1024)/1024,2).' Mo';
+	} else if($size >= 1073741824) {
+		return round((($size/1024)/1024)/1024,2).' Go';
+	}
+}
+
+function return_bytes($val)
+{
+	$val   = trim($val);
+	$unite = strtolower($val{strlen($val)-1});
+	switch($unite) {
+	  case 'g':
+		$val *= 1024;
+	  case 'm':
+		$val *= 1024;
+	  case 'k':
+		$val *= 1024;
+	}
+	return $val;
+  }
+
+function max_upload_file ($nb_file = 1, $margin_of_error = 512000)
+{
+	$post_max_size = @ini_get('post_max_size');
+	if (empty($post_max_size)) {
+		$post_max_size = @get_cfg_var('post_max_size');
+		if (empty($post_max_size)) {
+			$post_max_size = '6M';
+		}
+	}
+	$memory_limit = @ini_get('memory_limit');
+	if (empty($memory_limit)) {
+		$memory_limit = @get_cfg_var('memory_limit');
+		if (empty($memory_limit)) {
+			$memory_limit = '6M';
+		}
+	}
+	$upload_max_filesize = @ini_get('upload_max_filesize');
+	if (empty($upload_max_filesize)) {
+		$upload_max_filesize = @get_cfg_var('upload_max_filesize');
+		if (empty($upload_max_filesize)) {
+			$upload_max_filesize = '2M';
+		}
+	}
+	$post_max_size       = return_bytes($post_max_size);
+	$memory_limit        = return_bytes($memory_limit);
+	$upload_max_filesize = return_bytes($upload_max_filesize);
+	if ($memory_limit < $post_max_size) {
+		$post_max_size = $memory_limit;
+	}
+	$post_max_size = $post_max_size - $margin_of_error;
+	$memory_limit  = $memory_limit - $margin_of_error;
+	$return        = $post_max_size / ($nb_file + 1.5);
+	if ($return > $upload_max_filesize) {
+		$return = $upload_max_filesize;
+	}
+	return intval($return);
+}
+
+function scan_directory ($dir) {
 	$list_dir = array();
 	$my_directory = opendir($dir) or die('Error');
 	while($entry = @readdir($my_directory)) {
@@ -161,20 +232,36 @@ function scan_directory($dir) {
 	return $list_dir;
 }
 
-function return_bytes ($val) {
-	$val = trim($val);
-	$last = strtolower($val[strlen($val)-1]);
-	switch($last) {
-		// Le modifieur 'G' est disponible depuis PHP 5.1.0
-		case 'g':
-			$val *= 1024;
-		case 'm':
-			$val *= 1024;
-		case 'k':
-			$val *= 1024;
+function scan_file ($dir, $ext = false, $full_access = false) {
+	$list_files = array();
+	if (is_dir($dir)) {
+		// si il contient quelque chose
+		if ($dh = opendir($dir)) {
+			// boucler tant que quelque chose est trouve
+			while (($file = readdir($dh)) !== false) {
+				// affiche le nom et le type si ce n'est pas un element du systeme
+				if ($file != '.' && $file != '..') {
+					if ($ext) {
+						$fileExt = substr ($file, -3);
+						if (is_array($ext)) {
+							if (array_search($fileExt, $ext)) {
+								$list_files[] = ($full_access) ? $dir.$file : $file;
+							}
+						} else {
+							if ($fileExt == $ext) {
+								$list_files[] = ($full_access) ? $dir.$file : $file;
+							}
+						}
+					} else {
+						$list_files[] = ($full_access) ? $dir.$file : $file;
+					}
+				}
+			}
+			// on ferme la connection
+			closedir($dh);
+		}
 	}
-
-	return $val;
+	return $list_files;
 }
 
 function remove_accent ($str)
@@ -212,3 +299,19 @@ function make_constant ($str) {
 	
 	return $return;
 }
+function random_color () {
+	$str = '#';
+	for($i = 0 ; $i < 6 ; $i++) {
+		$randNum = rand(0 , 15);
+		switch ($randNum) {
+			case 10: $randNum = 'A'; break;
+			case 11: $randNum = 'B'; break;
+			case 12: $randNum = 'C'; break;
+			case 13: $randNum = 'D'; break;
+			case 14: $randNum = 'E'; break;
+			case 15: $randNum = 'F'; break;
+		}
+		$str .= $randNum;
+	}
+	return $str;
+} 
