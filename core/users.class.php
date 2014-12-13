@@ -26,10 +26,9 @@ class Users
 		'hash_key',
 		'date_registration',
 		'last_visit',
-		'website',
 		'groups',
 		'valid',
-		'last_ip'
+		'ip'
 	);
 	#####################################
 	# Start Class
@@ -46,21 +45,32 @@ class Users
 	#####################################
 	public static function updateLastVistst() {
 		if (isset($_SESSION['hash_key'])) {
-			return BDD::getInstance() -> update(
+			$return = (int) BDD::getInstance() -> count(
 				array(
 					'table' => self::$_table,
-					'data'  => array(
-						'last_visit' => date('Y-m-d H:i:s'),
-						'last_ip'    => get_ip()
-					),
 					'where' => array(
 						'name' => 'hash_key',
-						'value'=> $_SESSION['hash_key']
+						'value' => $_SESSION['hash_key']
 					)
 				)
 			);
-		} else {
-			$_SESSION['groups'] = 3;
+			if ($return === 0) {
+				self::logout();
+			} else {
+				BDD::getInstance() -> update(
+					array(
+						'table' => self::$_table,
+						'data'  => array(
+							'last_visit' => date('Y-m-d H:i:s'),
+							'ip'    => get_ip()
+						),
+						'where' => array(
+							'name' => 'hash_key',
+							'value'=> $_SESSION['hash_key']
+						)
+					)
+				);
+			}
 		}
 	}
 	#####################################
@@ -98,6 +108,21 @@ class Users
 						$_SESSION[$key] = $results[$key];
 					}
 					unset($_SESSION['password']);
+
+					$arrayInsertListConnexions = array(
+						'id' => '',
+						'hash_key' => $results['hash_key'],
+						'date' => date('Y-m-d H:i:s'),
+						'ip' => get_ip()
+					);
+
+					BDD::getInstance()->insert(
+						array(
+							'table'  => TABLE_LIST_CONNEXIONS,
+							'data' => $arrayInsertListConnexions
+						)
+					);
+
 					$return = 'La connexion a été éffectuée avec succès';
 				} else {
 					$return = 'Mauvaise combinaison de Pseudonyme/mail et mot de passe';
@@ -143,17 +168,17 @@ class Users
 						'fields' => self::$def
 					);
 
-					$arrayRead['where'][] = array(
+					$datas['where'][] = array(
 										'name'  => 'name',
 										'value' => $name
 					);
 
-					$arrayRead['where'][] = array(
+					$datas['where'][] = array(
 										'name'  => 'hash_key',
 										'value' => $hash_key
 					);
 
-					$arrayRead['where'][] = array(
+					$datas['where'][] = array(
 										'name'  => 'password',
 										'value' => $hash
 					);
