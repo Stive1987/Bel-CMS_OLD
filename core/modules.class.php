@@ -30,15 +30,19 @@ final class Modules extends Common
 	#####################################
 	public function __construct($name = null, $action = null)
 	{
-		$this->modName   = ($name == null)   ? $this->default_mod : $name;
-		$this->modAction = ($action == null) ? 'index' : $action;
-		if (ACTIVE_COMMENTS) {
-			$comment = new Comments();
-			$this->comments = $comment->content;
+		if ($this->getAccessModules()) {
+			$this->modName   = ($name == null)   ? $this->default_mod : $name;
+			$this->modAction = ($action == null) ? 'index' : $action;
+			if (ACTIVE_COMMENTS) {
+				$comment = new Comments();
+				$this->comments = $comment->content;
+			}
+	 		self::getModel();
+			self::getController();
+			self::getView();
+		} else {
+			echo Error::render('No access modules', ERROR);
 		}
- 		self::getModel();
-		self::getController();
-		self::getView();
 	}
 	#####################################
 	# Get Model (BDD)
@@ -104,6 +108,38 @@ final class Modules extends Common
 		} else {
 			throw new Exception('No file controller.class.php present in directory ' . $this->controllerDir.$this->modName);
 		}
+	}
+	#####################################
+	# Get access modules
+	#####################################
+	private function getAccessModules ()
+	{
+		$return = false;
+
+		$results = BDD::getInstance() -> read(array('table'=>TABLE_MODULES));
+
+		if ($results)
+		{
+			$array_groups = (isset($_SESSION['groups'])) ? explode('|', $_SESSION['groups']) : array(3);
+
+			foreach ($results as $v) {
+				if ($v['name'] == GET_MODULE) {
+					if ($v['groups_access'] == 0) {
+						$return = true;
+					} else {
+						$v['groups_access'] = explode('|', $v['groups_access']);
+						foreach ($v['groups_access'] as $group) {
+							if (in_array($group, $array_groups)) {
+								$return = true;
+								break;
+							}
+						}
+					}
+					break;
+				}
+			}
+		}
+		return $return;
 	}
 	#####################################
 	# Value assigned to the property

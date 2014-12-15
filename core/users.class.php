@@ -198,7 +198,7 @@ class Users
 					return false;
 				}
 			} else {
-					return false;
+				return false;
 			}
 		}
 	}

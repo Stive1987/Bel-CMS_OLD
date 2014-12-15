@@ -20,6 +20,7 @@ $array =   array(
 	'TABLE_ACTION'          => 'infos_action',
 	'TABLE_LIST_CONNEXIONS' => 'list_connections',
 	'TABLE_MAIL_BLACKLIST'  => 'mails_blacklist',
+	'TABLE_MODULES'         => 'modules',
 	'TABLE_NEWS'            => 'news',
 	'TABLE_PAGES'           => 'pages',
 	'TABLE_USERS'           => 'users',
